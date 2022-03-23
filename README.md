@@ -1,2 +1,3 @@
 # Lucas_Nava_Repository
  
+My final project revolves around calculating the results and statistics of the Beijing 2022 Winter Olympic Games and comparing them to the results and statistics of the Seoul 2018 Winter Olympic Games. I'm planning on using the data found to learn more about which countries produce the most medals and why. I want to know if a country's success is due to individual athletes or the country as a whole.
