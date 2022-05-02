@@ -1,0 +1,100 @@
+---
+title: "Lucas_Nava_Final_Project"
+output: html_notebook
+---
+
+#First, we have to run the necessary functions to ensure that the data is processed smoothly.
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(janitor)
+```
+
+#Next, I'm going to arrange some data regarding the medal totals following the 2022 Winter Olympics.
+
+```{r}
+medals_total %>% arrange(desc(`Total`))
+```
+
+#From this data, we can see that Norway won the most medals in 2022, with a total of 37. Now, let's see which individual athletes won the most medals.
+
+```{r}
+medals %>% count(athlete_name) %>% arrange(desc(n)) %>% filter(n == 5)
+```
+
+#Now, we have 4 athletes who've won 5 medals each, which is the largest number any athlete collected during the 2022 event. I'm going to pull their nationalities and medals now.
+
+```{r}
+medals %>% filter(athlete_name == "BOE Johannes Thingnes") %>% arrange(desc(medal_code))
+
+medals %>% filter(athlete_name == "BOLSHUNOV Alexander") %>% arrange(desc(medal_code))
+
+medals %>% filter(athlete_name == "FILLON MAILLET Quentin") %>% arrange(desc(medal_code))
+
+medals %>% filter(athlete_name == "ROEISELAND Marte Olsbu") %>% arrange(desc(medal_code))
+```
+
+#Boe and Roiseland are Norwegian, Bolshunov is Russian, and Fillon is French. Going back to the medal count at the top of the page, we can see that Norway won 37 total medals, while Russia won 32. That's a mere 5-medal difference, meaning that, depending on how you view it, Boe or Roiseland alone were enough to keep Russia from tying or beating Norway in the medal count. This would indicate that, at least in the case of the latest Olympics, individual athletes were crucial to the success of a collective nation at the event. However, I also want to count how many athletes each country had to verify if the quality of the athletes was more important than the quantity.
+
+```{r}
+medals %>% count(country) %>% arrange(desc(n))
+```
+
+#(Please note that some countries had athletes competing in multiple events. While I don't feel that this discredits the data, said data shouldn't be considered an accuate head count of individual people.) Interestingly enough, while Russia had 86 athletes, the most out of any medal-winning country, Norway had 58, the 5th-most. Despite that, Norway was able to pull ahead of 4 other countries with more athletes to claim the highest number of medals, which helps to support the quality-or-quantity idea which I mentioned earlier. Now, I'm going to compare these results to the medal count from 2014.
+
+```{r}
+athlete_events %>% filter(grepl("Gold|Silver|Bronze",Medal)) %>% filter(grepl("Winter",Season)) %>% filter(grepl("2014",Year)) %>% count(Name) %>% arrange(desc(n))
+```
+
+#Notably, only one athlete managed to get 5 medals. Regardless, I'll do what I did before and find out the home countries of the top athletes.
+
+```{r}
+athlete_events %>% filter(Name == "Irene Karlijn \"Ireen\" Wst" & !is.na(Medal) & Games == "2014 Winter")
+
+athlete_events %>% filter(Name == "Viktor An" & !is.na(Medal) & Games == "2014 Winter")
+
+athlete_events %>% filter(Name == "Arianna Fontana" & !is.na(Medal) & Games == "2014 Winter")
+
+athlete_events %>% filter(Name == "Darya Vladimirovna Domracheva" & !is.na(Medal) & Games == "2014 Winter")
+
+athlete_events %>% filter(Name == "Maksim Mikhaylovich Vylegzhanin" & !is.na(Medal) & Games == "2014 Winter")
+```
+
+#For this last set of code, it's important to note that 12 different 2014 Winter athletes won 3 medals, meaing that Fontana, Domracheva, and Vylegzhanin can potentially be switched out in regards to this data. With that in mind, let us note that Wst is Danish, An is Russian, Fontana is Italian, Domracheva is Belarusian, and Vylegzhanin is Russian. Now, I'll pull data regarding each country's medal totals.
+
+```{r}
+athlete_events %>% filter(Games == "2014 Winter") %>% filter(!is.na(Medal)) %>% count(Team) %>% arrange(desc(n))
+```
+
+#What's interesting here is that Canada, despite not being the home country of any of the aforementioned athletes, still held a massive lead in regards to the medal total. It raises the possibility that, at least during the 2014 Winter Olympics, the number of athletes mattered more than each athlete's skill. Still, Russia having at least two athletes that scored 3 medals each helped them keep their lead over the United States and Sweden, so individual talent still matters to an extent. To conclude this segment, I'm going to find the total number of athletes per country for 2014.
+
+```{r}
+athlete_events %>% filter(Games == "2014 Winter") %>% count(Team) %>% arrange(desc(n))
+```
+
+#This data might actually support the "quality over quantity" argument. Canada, despite only having 6 more athletes than Russia, won over 20 more medals than them. The United States, which had the largest number of athletes, lost to both Russia and Canada in the medal count. In the final segment of this project, I'm going to look at both the 2022 and 2014 Winter Olympics and figure out how many of each medal each country earned. I'll start with 2022.
+
+```{r}
+medals_total %>% group_by(Country) %>% arrange(desc(Total))
+```
+
+#It seems as though, at least in regards to Norway and the ROC, gold medals were the tiebreaker. While the ROC won more silver and bronze medals than Norway, Norway won 10 more gold medals, solidifying their lead. Still, while Germany won 6 more medals than the ROC, they still lost in the overall count due to the ROC winning more silver and bronze medals. Because of this, it seems as though having more gold-medal winners matters less than having more medal winners in general. Now, I'll pull the same data from 2014.
+
+```{r}
+athlete_events %>% filter(Games == "2014 Winter") %>% filter(!is.na(Medal)) %>% filter(Medal == "Gold") %>% group_by(Team) %>% count(Team) %>% arrange(desc(n))
+```
+
+```{r}
+athlete_events %>% filter(Games == "2014 Winter") %>% filter(!is.na(Medal)) %>% filter(Medal == "Silver") %>% group_by(Team) %>% count(Team) %>% arrange(desc(n))
+```
+
+```{r}
+athlete_events %>% filter(Games == "2014 Winter") %>% filter(!is.na(Medal)) %>% filter(Medal == "Bronze") %>% group_by(Team) %>% count(Team) %>% arrange(desc(n))
+```
+
+#Remember that the top 3 medal-earning countries in 2014 were Canada with 82, Russia with 56, and the United States with 52. With that in mind, it seems as though Canada's lead depended almost entirely on their gold medal count. They only got the third-most silver medals, and they didn't make the top ten in the bronze medals totals. Still, they won over 30 more gold medals that Russia, the runner-up in the medal totals. Russia and the United States, the respective second and third-highest medal earners, have more mixed results. Russia won about 15 more gold medals than the United States, the United States won about 8 more silver medals than Russia, and the United States won about 5 more bronze medals than Russia.
+
+#(I should also note that, in the above data sets, there are some teams with a (-1) attached to their name, such as "United States -1" and "Russia -1". I can't say for sure what these values are meant to represent, so I didn't give them too much attention when gathering this information. If you know what these values mean, please let me know.)
+
+#In conclusion, I believe that individual athletes are more important to a country's success at the Olympics than the total number of athletes. The data that I analyzed indicated that, while athlete numbers have some sway, individual athletes' accomplishments have a more direct impact on medal totals.
